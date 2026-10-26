@@ -1,0 +1,8 @@
+- Subclass of `ApplePMGR`, own fields from 0x36968 to 0x36AE0
+	- Constructor base is `this+0x3696B` (the odd `#0x96B` in disassembly)
+	- 0x36988: `AppleARMIODevice::getClockFrequency(0)` of the provider, written in `initDriver`
+	- 0x36998: CPM power gating on (1, constructor), passed to `enableCPMPowerDomainGating` in [[AppleT6020PMGR/restoreHW|restoreHW]]
+	- 0x3699C: max cluster ID = 9 (constructor), bound of the cluster loop in [[AppleT6020PMGR/quiesceHW|quiesceHW]]
+	- 0x369A4: die count (`initDriver`), 1 on t6020
+	- 0x369AC: chip ID (0x6022 = M2 Ultra branches)
+- [[AppleT6020PMGR/initRegMaps|initRegMaps]]

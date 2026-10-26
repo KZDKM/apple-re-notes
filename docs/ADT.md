@@ -1,0 +1,13 @@
+Apple Device Tree: iBoot's hardware description passed to the macOS kernel, `DeviceTree.j414sap.im4p`
+- Decoded at `~/re/macos-13.5-22G74-j414s/firmware/payloads/DeviceTree.j414sap.json`
+- `reg` addresses are relative to the parent's `ranges`, walk up to get a PA (arm-io: child 0 -> 0x200000000)
+- `/arm-io/pmgr`
+	- `reg[n]`: MMIO regions, n = what `mapDeviceMemoryWithIndex(n)` maps
+	- `clusters`: 3 x (u16 core count, u16 0) = 4 / 4 / 4
+	- `soc-clusters`: 28 byte entries (phys ID, ?, flags, cluster ID, ..., voltage rail @11, name @12)
+		- EACC phys 0 / id 1, PACC0 1 / 2, PACC1 2 / 3, ANE0 3 / 6, DISPLAY 4 / 8, AVEMSR 6 / 9
+	- `bridge-reg-index` = 0, `ps-regs` / `pwrgate-regs` / `perf-regs`: 12 byte entries, first field = `reg` index
+- `/cpus`: cluster 0 = E (cpu0-3), 1 and 2 = P (cpu4-7, cpu8-11)
+- `smc-pmu` `event_name-bitN`: MBSW wake bits (0 pwrbtn, 8 lid, 11 wifibt, 40 acattach, 48 rtc ...)
+- Sleep related flags: `losesPowerInSleep` (clvr-spmi0..2), `shutdown-sleep` (ans, gfx), `manual-enable-s2r` (apcie bridges), `no-resume-restore` (gpio)
+- No `sleep-pwr-policy` node on J414s -> `AppleSleepPowerPolicy` not loaded

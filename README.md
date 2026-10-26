@@ -1,0 +1,1 @@
+This repo contains fragments of notes gathered from attempts of lowering power consumption on J414 running Asahi Linux via reverse engineering the macOS kernel cache and experimentation with a test module under linux.

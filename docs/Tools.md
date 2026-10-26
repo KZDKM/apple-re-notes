@@ -1,0 +1,7 @@
+- `~/ida-tools` (README inside): `fieldx` (field access index), `ida_reanalyze` (`type_this`, `decomp_seg`), `ida_field` (`fld`), `ida_ipsw_vtables`, `ida_vcall`, `idah2bn`
+- `~/re/headless/kc.i64`: copy of the IDA DB for idalib, `~/re/tools/hl/` scans
+- `~/re/playground/smcpg`: playground module, `exp=` bitmask
+	- 1 slpw / waka, 2 WKTP, 4 slpa (polled, `suspend_noirq`), 8 early MBSE read + waka (`resume_noirq`), 0x10 PMGR `0xC000` bit 31, 0x20 SEP force on, 0x40 dump `CLUSTER_CTL`
+	- `resume_hold_ms` + `console_suspend=N`: hold screen with log replay, for resumes that never reach the journal
+	- `KEY_POWER` dropped for 2 s after resume (late wake press otherwise resuspends)
+	- `kdir.sh`: finds a dev tree matching the booted kernel, keeps a GC root

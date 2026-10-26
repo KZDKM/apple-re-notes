@@ -1,0 +1,13 @@
+- `fields`
+	- 10844: `_dieCount`
+	- 10852: also
+	- 223644: also die count
+- Object offsets (class size 0x36968, `this+0x88` = provider, first own field)
+	- 0xB20: `regMaps[86][2]` ([map][die], 40 bytes: id +0x8 = ADT `reg` index, `IOMemoryMap *` +0x10, va +0x18), filled by [[initRegMap]]
+	- 0x2600: `regGroups[34]` (24 bytes: name ptr, present +0x8, map +0xC, offset +0x10), filled by [[initRegGroup]]
+		- Names from a template the constructor `memmove`s in: `ISP_REF0_CLK_CFG`, `TOUCH`, `CLUSTER_CTL` (group 2), `SOC_TVM`, `*_TRIG_CTL`, `MINI_MISC_CFG`, `DPE0_CFG`, `ANE_PERF_STATE` ...
+	- 0x1B170: `clusterInfoStart`, array of 48 byte entries (desc ptr +0, power state +8, reporter +0x20, die +0x28), one per ADT `soc-clusters` entry
+	- 0x1B17C: count of `soc-clusters` entries
+	- 0x1B180: `physClusters[2][32]` (u16, [die][cluster ID] -> `clusterInfo` index, 0xFFFF = none)
+- Register access: `readPMGRReg(off, die)` = map 0, `readReg32(map, off, die)` = `*(regMaps[map][die].va + off)`
+- [[enableCluster]], [[getPhysicalClusterID]]

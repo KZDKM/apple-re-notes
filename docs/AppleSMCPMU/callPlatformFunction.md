@@ -1,0 +1,12 @@
+Platform sleep/wake actions, last step of sleep and first step of wake
+- Registered as platform action through kext personality: `IOPlatformSleepAction` / `IOPlatformWakeAction` = 200
+	- Called by xnu `IOPlatformActions` from `IOCPUSleepKernel`, after all drivers are powered off
+- Only does anything if `this+213` is set
+	- Set in `AppleSMCPMU::start`: SMC has key `MBSE` with size 4
+- `gIOPlatformSleepActionKey`: `AppleSMCInterface::changePowerState(0)` -> `AppleSMC::`[[_powerStateActionGated]](0)
+- `gIOPlatformWakeActionKey`: `AppleSMCInterface::changePowerState(1)` -> `AppleSMC::`[[_powerStateActionGated]](1)
+	- MBSE byte is reported as wake event `SMC.MBSE.xx`
+	- Reads MBSW (8 bytes), wake event bitmap
+		- Bit N = byte N/8, bit N%8, each set bit -> `nameWakeReason` -> `claimSystemWakeEvent`
+		- Bit names in ADT `smc-pmu` node `event_name-bitN`: 0 pwrbtn, 8 lid, 11 wifibt, 12 trackpadkeyboard, 40 acattach, 48 rtc ...
+	- Writes MBSE=waka

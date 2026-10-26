@@ -1,0 +1,19 @@
+macOS drivers hook the last step of sleep / first step of wake through xnu platform actions (`IOCPUSleepKernel`)
+- Registered by kext personality (`IOPlatformSleepAction` / `IOPlatformWakeAction` / `IOPlatformQuiesceAction` / `IOPlatformActiveAction` = priority) or `setProperty` in `start`
+- Sleep / Wake: right before / after the CPUs stop, all drivers already powered down
+- Quiesce / Active: around the CPU power off itself, used to save / restore hardware state lost in S2R (suspend to RAM)
+- Bound on J414s (personality matched against ADT):
+	- Sleep + Wake: `AppleSMC` 300, `AppleSMCPMU` 200, `AppleSMCCharger` (wake 100), `ApplePMP` 610, `AppleSmartIO` 590, `AppleCLPC` 500, `AppleARMWatchdogTimer` 350, `AppleDialogSPMIPMU` 400, `AppleAVD` 100, `AppleProResHW` 100
+	- Wake only: `AppleT8101GPIOIC` 500, `AppleKeyStore` 1000
+	- Quiesce + Active: `AppleT6020PMGR` 90000 (+ sleep / wake 600), `AppleInterruptControllerV2` 97000, `AppleT6020MemCacheController` 89000, `AppleT6020PlatformErrorHandler` 89000, `AppleT6020SOCTuner` 88000, `AppleEventLogHandler` 88000, `AppleT6020PCIe` / `AppleT6000PCIeC` (quiesce 4000, active 1500), `AppleDialogSPMIPMU`, `AppleARMWatchdogTimer`, `AppleT8101GPIOIC`
+	- Active only: `AppleT602xIO` (no-op), `AppleS5L8960XNCO` (clocks), `AppleS8000DWI` (display backlight interface)
+	- Sleep + Active: `AppleT8110DART` 80000 (IOMMUs)
+	- From code: `AppleARMSPMIController` (restores controller regs if `losesPowerInSleep`), `AppleARMIICController`, `AppleARMSPIController`, `AppleARMRTC`, `AppleARMIISSwitch`, `AppleStockholmSPMI`, `AppleThunderboltGenericHAL`
+- `ApplePMGR`
+	- Sleep: `_quiescePerfStateChanges`
+	- Quiesce: `quiesceHW`, T6020 override saves / reprograms clock gen SOC regs and SOC east regs
+	- Active: `restoreHW` -> `_syncDeviceStatus`, `_setPSRunMaxAll`, `_applyParam`, `_enableFeature`, perf counters; T6020 override restores DCS / fabric perf states, SOC east regs, `notifyPMPInitialDeviceStatus`
+	- Wake: `_applyValidParamDVDFactors`
+	- String "light-em-up=1 not supported for S2R" -> macOS sleep is S2R where SoC state is lost
+- slpa on Linux needs the Quiesce / Active part at least (PMGR, AIC, MCC, SOC tuner, DART, PCIe, SPMI), Linux has none of it TODO: per driver what exactly is restored
+	- PMGR in progress: [[AppleT6020PMGR/quiesceHW|quiesceHW]], [[AppleT6020PMGR/restoreHW|restoreHW]]

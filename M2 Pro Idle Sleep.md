@@ -1,0 +1,17 @@
+Goal: Linux s2idle on J414s from ~1.9 W towards macOS sleep (0.24 W at the wall)
+- String `going to sleep -> writing WKTP=` in kernel -> `AppleSMC::`[[AppleSMC/setPowerState|setPowerState]]
+	- -> whole macOS SMC sleep / wake sequence: [[SMC sleep sequence]]
+	- -> Linux sends none of it, checked keys on hardware: [[SMC keys on J414s]]
+- Replay it from a playground module (smcpg, [[Tools]])
+	- [[exp1 slpw waka]]: SMC reacts, wake reason byte appears
+	- [[exp3 WKTP]]: ~1.0 W in one run, black screen = late power key
+		- -> how to measure at all: [[Measuring sleep power]]
+	- [[exp5 slpa]]: SMC accepts it, NVMe dead on resume
+		- [[exp13 early wake]]: macOS wake order, ANS doesn't boot
+		- -> why: [[S2R and lost state]] -> which drivers restore what: [[Platform actions]]
+			- PMGR first: [[AppleT6020PMGR/restoreHW|restoreHW]] / [[AppleT6020PMGR/quiesceHW|quiesceHW]]
+				- [[PMGR restore steps]]: `0xC000` fatal alone, SEP force on fine
+				- quiesce cluster loop -> [[Cluster control]]: Linux keeps every cluster on
+- Reference: [[ADT]], `ApplePMGR` [[ApplePMGR/Class|Class]], `AppleT6020PMGR` [[AppleT6020PMGR/Class|Class]]
+- Side tracks: [[Dead ends]]
+- Parallel work on the same machine, numbers and HV traces: [[Aurora-DeepIdle]]

@@ -1,0 +1,22 @@
+What macOS tells the SMC around sleep, found from the `AppleSMCEmbedded::%s(): going to sleep -> writing WKTP=` string
+- Sleep:
+	- Sleep warning: `AppleSMCPMU::`[[handleSystemPowerStateChange]]
+		- Writes MBSE=slpw
+	- Sleep power policy driver sets state: `AppleSleepPowerPolicy::`[[AppleSleepPowerPolicy/setPowerState|setPowerState]](0)
+		- Writes MMPP = `!`[[turnOffPS]]`()`
+		- Not loaded on J414s (no `sleep-pwr-policy` node in ADT), skip
+	- SMC driver sets its power state: `AppleSMC::`[[AppleSMC/setPowerState|setPowerState]](0)
+		- WKTP = 2, only if SMC has key `WKTP`
+	- Last call chain: `AppleSMCPMU::`[[callPlatformFunction]](`gIOPlatformSleepActionKey`)
+		- `AppleSMCInterface::changePowerState(0)` -> `AppleSMC::`[[_powerStateActionGated]](0)
+		- Writes MBSE=slpa (hiba if hibernating), then blocks all SMC commands
+- Wake:
+	- `AppleSMCPMU::`[[callPlatformFunction]](`gIOPlatformWakeActionKey`)
+		- `AppleSMCInterface::changePowerState(1)` -> `AppleSMC::`[[_powerStateActionGated]](1)
+			- Reads MBSE, byte 1 is the wake reason
+		- Reads MBSW (8 bytes)
+		- Writes MBSE=waka
+- Linux `macsmc` has no suspend/resume hooks, none of the above is sent on s2idle
+	- `macsmc-reboot` only writes MBSE on shutdown/reboot (offw/off1/phra)
+- All of the MBSE writes are enabled iff SMC has key `MBSE` (size 4)
+- Keys on J414s: [[SMC keys on J414s]]

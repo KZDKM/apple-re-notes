@@ -1,0 +1,4 @@
+- `idle_fabric_pstate=1` crashes DCP on J414s, unusable
+- tas2764 `over current` / `bad TDM clock` bursts come from audio teardown (VT switch, video), also before smcpg was loaded
+- AppleSleepPowerPolicy / MMPP: not loaded on J414s
+- Binary Ninja as second tool: no native ARM build, partial loads miss cross-kext symbols, stayed in IDA ([[Tools]])

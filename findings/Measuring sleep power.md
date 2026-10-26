@@ -1,0 +1,4 @@
+- `PSTR` and battery keys (`B0AC` / `B0AP`) are instantaneous, useless right after resume
+- Battery gauge corrects remaining capacity after rest (`B0RM` went up 49 mAh over 4 min) -> short `energy_now` runs unreliable
+- % resolution too coarse for short runs
+- Long runs (>= 6 h, `power-log.sh`) or a USB-C meter on AC at the charge limit

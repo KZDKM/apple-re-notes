@@ -2,3 +2,6 @@
 - Battery gauge corrects remaining capacity after rest (`B0RM` went up 49 mAh over 4 min) -> short `energy_now` runs unreliable
 - % resolution too coarse for short runs
 - Long runs (>= 6 h, `power-log.sh`) or a USB-C meter on AC at the charge limit
+- Awake / instant: SMC hwmon `Total System Power` (PSTR), `Heatpipe Power` ~ SoC, average with `pstr-avg.sh` ([[Tools]]), display off, not charging
+- `cpups` sampling shows which cores / CPMs actually power gate ([[CPU idle and clusters]])
+- macOS reference on this machine: sleep 0.24 W, Linux s2idle ~1.4 W ([[Aurora-DeepIdle]])

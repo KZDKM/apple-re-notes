@@ -1,0 +1,13 @@
+Asahi / Aurora drivers that matter for idle and sleep power on J414s
+- `pmgr-pwrstate`: one genpd per `apple,pmgr-pwrstate` node
+	- Active only if actual F (or target F + auto) -> domains left at 4 by the bootloader count as off and never get `power_off` ([[Domain inventory]])
+	- Turns on auto PM for active domains, programs `PS_MIN` for `apple,min-state` ones
+	- Plain PS writes, none of T6020's [[writeReg32]] workarounds (ANE TVM, fabric bit 29)
+- `apple-pmgr-misc` (`28e20c000`): fabric-ps `0x28e20c000`, dcs-ps `0x28e20c400`
+	- s2idle: fabric 5 -> 1, DCS 9 -> 1 in `suspend_noirq`, back on resume, confirmed actual 1/1
+	- With PMP running: "PMP manages fabric and DCS p-states", only lowers the fabric
+	- `idle_fabric_pstate=1` crashes DCP ([[Dead ends]])
+- `cpuidle-apple`: WFI / CPU PD, 10 ms PD residency ([[CPU idle and clusters]])
+- `apple-dart`: no runtime PM, `suppress_bind_attrs` -> DARTs of unused blocks (ANE) hold their domains on forever
+- `pmp-report` / `apple_pmp`: [[PMP dashboard]]
+- SMC family: [[SMC keys on J414s]]

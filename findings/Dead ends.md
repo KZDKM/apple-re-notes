@@ -2,3 +2,11 @@
 - tas2764 `over current` / `bad TDM clock` bursts come from audio teardown (VT switch, video), also before smcpg was loaded
 - AppleSleepPowerPolicy / MMPP: not loaded on J414s
 - Binary Ninja as second tool: no native ARM build, partial loads miss cross-kext symbols, stayed in IDA ([[Tools]])
+- Disabling the external DCPs: macOS keeps them ACT while awake, and [[Aurora-DeepIdle]] measured no cost with nothing attached
+- E-only via `maxcpus=4`: parked P cores sit in m1n1's `wfe` loop, cutting their cluster hangs the SoC ([[Cluster control]])
+- `0xC000` bit 31 as the missing cluster gating enable: fatal before a cut too
+- `soc-` / `acc-cluster-power-gating`, `cpm-power-gating-hack`: software masks only, no hardware enable ([[ApplePMGR/Features|Features]])
+- `ANE_TRIG_CTL` / `ane-dpe`: throttle trigger, never changed by macOS on J414s
+- PMP doorbell in `_cpuIdle`: needs feature `pmp` = 1, J414s has 2
+- `enableCPMPowerDomainGating`: bits already set on Linux
+- Probe time power gating of leftover domains in `pmgr-pwrstate`: reverted, suspend only gating in smcsleep is enough

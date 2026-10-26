@@ -1,0 +1,12 @@
+PMP = fabric / memory power controller coprocessor, macOS reports device power to it through the PTD ("dashboard")
+- PTD in the `pmp_report` block `0x28e3c0000` (t602x): status `+0x10` (bit 0 = PMP ready), request read `+0x2000` / write `+0x11000`, ack `+0x2080`
+- One bit per PMP soc device = device record byte 3 - 1 ([[ADT]]), `ANE_SYS` = bit `0xb`
+- macOS `_pmpWriteDashBoardSetDeviceState(dev, level, die)`: set / clear the request bit, then poll PMP status + ack up to 15 s
+	- HV trace by [[Aurora-DeepIdle]]: all device power goes through it, steady state only `PCPM0` / `PCPM1` / `DISP0_FE` / `GFX` requested
+- Linux `drivers/pmdomain/apple/pmp-report.c`: each report entry is a power domain under a PS domain, sets / clears its bit, waits 50 ms for the ack if PMP is ready
+	- J414s entries: ane-sys / venc / msr0 / jpg / scodec disabled, isp / avd okay, disp0 / dispext0 / dispext1 always on
+- PMP coprocessor: `drivers/soc/apple/pmp.rs` (`apple_pmp`), boot args from the ADT patch bay tags
+	- Stock J414s: node disabled, m1n1 runs out of DT space for its 81 tunables -> PMP never runs, PTD status 0, request `0xe000`
+	- Booted since 2026-10-26 with their fix ([[Current setup]]), pmgr-misc then leaves fabric / DCS to PMP
+- `pmp` feature = 2 on J414s: `_cpuIdle` never rings the PMP doorbell (needs 1), PMP gets ACC state notifications in `quiesceACC` / `restoreACC`
+- PMP running didn't make ANE TVM off survivable ([[Cluster control]])

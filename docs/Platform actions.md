@@ -9,7 +9,7 @@ macOS drivers hook the last step of sleep / first step of wake through xnu platf
 	- Active only: `AppleT602xIO` (no-op), `AppleS5L8960XNCO` (clocks), `AppleS8000DWI` (display backlight interface)
 	- Sleep + Active: `AppleT8110DART` 80000 (IOMMUs)
 	- From code: `AppleARMSPMIController` (restores controller regs if `losesPowerInSleep`), `AppleARMIICController`, `AppleARMSPIController`, `AppleARMRTC`, `AppleARMIISSwitch`, `AppleStockholmSPMI`, `AppleThunderboltGenericHAL`
-- `ApplePMGR`
+- `ApplePMGR` (exact mapping in [[ApplePMGR/start|start]], `restoreHW` also runs at every boot)
 	- Sleep: `_quiescePerfStateChanges`
 	- Quiesce: `quiesceHW`, T6020 override saves / reprograms clock gen SOC regs and SOC east regs
 	- Active: `restoreHW` -> `_syncDeviceStatus`, `_setPSRunMaxAll`, `_applyParam`, `_enableFeature`, perf counters; T6020 override restores DCS / fabric perf states, SOC east regs, `notifyPMPInitialDeviceStatus`

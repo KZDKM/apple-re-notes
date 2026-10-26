@@ -1,17 +1,25 @@
 Goal: Linux s2idle on J414s from ~1.9 W towards macOS sleep (0.24 W at the wall)
+- Where things stand: [[Current setup]]
 - String `going to sleep -> writing WKTP=` in kernel -> `AppleSMC::`[[AppleSMC/setPowerState|setPowerState]]
 	- -> whole macOS SMC sleep / wake sequence: [[SMC sleep sequence]]
 	- -> Linux sends none of it, checked keys on hardware: [[SMC keys on J414s]]
 - Replay it from a playground module (smcpg, [[Tools]])
-	- [[exp1 slpw waka]]: SMC reacts, wake reason byte appears
+	- [[exp1 slpw waka]]: SMC reacts, wake reason byte appears -> kept in smcsleep
 	- [[exp3 WKTP]]: ~1.0 W in one run, black screen = late power key
 		- -> how to measure at all: [[Measuring sleep power]]
 	- [[exp5 slpa]]: SMC accepts it, NVMe dead on resume
 		- [[exp13 early wake]]: macOS wake order, ANS doesn't boot
 		- -> why: [[S2R and lost state]] -> which drivers restore what: [[Platform actions]]
-			- PMGR first: [[AppleT6020PMGR/restoreHW|restoreHW]] / [[AppleT6020PMGR/quiesceHW|quiesceHW]]
+			- PMGR first: [[AppleT6020PMGR/restoreHW|restoreHW]] / [[AppleT6020PMGR/quiesceHW|quiesceHW]], also at boot: [[ApplePMGR/start|start]]
 				- [[PMGR restore steps]]: `0xC000` fatal alone, SEP force on fine
 				- quiesce cluster loop -> [[Cluster control]]: Linux keeps every cluster on
+- What stays on in s2idle: [[Domain inventory]] -> leftover clock gated domains, `pgate`
+- CPU side: [[CPU idle and clusters]], cores and CPMs already gate, cluster off needs core shutdown
+- Peripheral cluster off (ANE / AVE): [[Cluster gating]]
+	- [[enableCluster]], [[_syncDeviceStatusChange]], [[_setPerfState]], [[writeReg32]], [[enableTVM]], [[ApplePMGR/Features|Features]]
+	- Every cut dies, also ANE TVM off -> needs a hypervisor trace
+- PMP: [[PMP dashboard]]
+- Linux side drivers: [[Linux power drivers]]
 - Reference: [[ADT]], `ApplePMGR` [[ApplePMGR/Class|Class]], `AppleT6020PMGR` [[AppleT6020PMGR/Class|Class]]
 - Side tracks: [[Dead ends]]
 - Parallel work on the same machine, numbers and HV traces: [[Aurora-DeepIdle]]

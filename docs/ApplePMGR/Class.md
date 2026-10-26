@@ -3,6 +3,9 @@
 	- 10852: also
 	- 223644: also die count
 - Object offsets (class size 0x36968, `this+0x88` = provider, first own field)
+	- 0x1B0 (432): feature `pmp` value, `_cpuIdle` rings the PMP doorbell only if 1 (J414s: 2)
+	- 0x320 (800): feature table, 78 x 16 bytes ([[ApplePMGR/Features|Features]]), `soc-cluster-power-gating` value at 1868
+	- 0x160: `IOCommandGate`, vtable +488 = `runAction`
 	- 0xB20: `regMaps[86][2]` ([map][die], 40 bytes: id +0x8 = ADT `reg` index, `IOMemoryMap *` +0x10, va +0x18), filled by [[initRegMap]]
 	- 0x2600: `regGroups[34]` (24 bytes: name ptr, present +0x8, map +0xC, offset +0x10), filled by [[initRegGroup]]
 		- Names from a template the constructor `memmove`s in: `ISP_REF0_CLK_CFG`, `TOUCH`, `CLUSTER_CTL` (group 2), `SOC_TVM`, `*_TRIG_CTL`, `MINI_MISC_CFG`, `DPE0_CFG`, `ANE_PERF_STATE` ...

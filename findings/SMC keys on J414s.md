@@ -7,3 +7,6 @@ Read with smcpg `info` / `value` (fw 27.0)
 	- MBSE byte 1 is the wake reason macOS reports (0 here), byte 0 = 0x30 unknown
 	- Unchanged after a lid-close s2idle -> SMC doesn't see Linux sleep at all
 - SMC firmware itself isn't in the IPSW (only `rt13m0` = USB-C retimer)
+- `MBSe` (lowercase e) in the Asahi docs is a different key: power button pressed since last read, read to clear
+	- macOS sleep / wake code only ever uses `MBSE` (whole kernel SMC key scan), smcsleep / smcpg write `MBSE` too
+- SMC on Linux: `drivers/mfd/macsmc.c` (RTKit mailbox, key API) + children `macsmc-input` (power / lid), `macsmc-power` (battery / AC), `macsmc-hwmon` (`PSTR` etc.), `macsmc-reboot` (offw / rest, no suspend hooks), `macsmc-rtc`, `macsmc-gpio`
